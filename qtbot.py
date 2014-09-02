@@ -13,11 +13,12 @@ def center(widget, view_index=None):
     Gets the global position of the center of the widget. If index is
     provided, widget is a view and get the center at the index position
 
-    :param widget: widget to get the center location of
-    :type widget: PyQt4.QtGui.QWidget
-    :param view_index: index of the item in the widget to get the center location of
-    :type view_index: PyQt4.QtCore.QModelIndex
-    :returns: (int, int) -- the (x,y) location in screen coordinates
+    Args:
+        widget (PyQt4.QtGui.QWidget) : widget to get the center location of
+        view_index (PyQt4.QtCore.QModelIndex) : index of the item in the widget to get the center location of
+    
+    Returns:
+        (int, int) -- the (x,y) location in screen coordinates
     """
     if view_index is not None:
         # widget is a subclass of QAbstractView
@@ -40,7 +41,8 @@ def click(widget, view_index=None):
     """
     Simulates a click at the center of the widget
 
-    :param view_index: If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
+    Args:
+        view_index (PyQt4.QtCore.QModelIndex) : If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
     """
     pos = center(widget, view_index)
     robouser.click(pos)
@@ -49,16 +51,18 @@ def doubleclick(widget, view_index=None):
     """
     Simulates a double click at the center of the widget
 
-    :param view_index: If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
+    Args:
+        view_index (PyQt4.QtCore.QModelIndex) : If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
     """
     pos = center(widget, view_index)
     robouser.doubleclick(pos)
 
 def move(widget, view_index=None):
     """
-    Simulates a click at the center of the widget
+    Moves the mouse cursor to the provided widget
 
-    :param view_index: If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
+    Args:
+        view_index (PyQt4.QtCore.QModelIndex) : If not None, assumes the given widget is a view, clicks the center of the indexed item in the view
     """
     pos = center(widget, view_index)
     robouser.move(pos)
@@ -67,8 +71,8 @@ def wheel(ticks):
     """
     Simulates a mouse wheel movement
 
-    :param ticks: number of increments to scroll the whell
-    :type ticks: int
+    Args:
+        ticks (int) : number of increments to scroll the wheel
     """
     # wrapper
     if ticks < 0:
@@ -84,17 +88,18 @@ def keypress(key):
     """
     Simulates a key press
 
-    :param key: the key [a-zA-Z0-9] to enter. Use 'enter' for the return key
-    :type key: str
+    Args:
+        key (str) : the key [a-zA-Z0-9] to enter. Use 'enter' for the return key
+
     """
     robouser.keypress(key)
 
 def type(msg):
     """
     Stimulates typing a string of characters
-    
-    :param string: A string of characters to enter
-    :type string: str
+
+    Args:    
+        string (str) : A string of characters to enter
     """
     robouser.type(str(msg))
 
@@ -102,14 +107,11 @@ def drag(src, dest, src_index=None, dest_index=None):
     """
     Simulates a smooth mouse drag from one widget to another
 
-    :param src: source widget
-    :type src: PyQt4.QtGui.QWidget
-    :param dest: widget to drag to
-    :type dest: PyQt4.QtGui.QWidget
-    :param src_index: If not None, assumes src widget is a view, drags from this item at index location 
-    :type src_index: PyQt4.QtCore.QModelIndex
-    :param dest_index: If not None, assumes dest widget is a view, drags to this item at index location
-    :type dest_index: PyQt4.QtCore.QModelIndex
+    Args:
+        src (PyQt4.QtGui.QWidget) : source widget
+        dest (PyQt4.QtGui.QWidget): widget to drag to
+        src_index (PyQt4.QtCore.QModelIndex): If not None, assumes src widget is a view, drags from this item at index location 
+        dest_index (PyQt4.QtCore.QModelIndex) : If not None, assumes dest widget is a view, drags to this item at index location
     """
     src_pos = center(src, src_index)
     dest_pos = center(dest, dest_index)
@@ -122,8 +124,8 @@ def handle_dialog(wait=False):
     """
     Listens for a top level dialog, and then simulates a return keypress e.g. to close it
 
-    :param wait: whether to (non-blocking) wait until dialog is closed to return
-    :type wait: bool
+    Args:
+        wait (bool): whether to (non-blocking) wait until dialog is closed to return
     """
     thread = threading.Thread(target=_close_toplevel)
     thread.start()
@@ -134,6 +136,7 @@ def handle_dialog(wait=False):
 def handle_modal_widget(fpath=None, wait=True, press_enter=True):
     """
     Listens for a modal dialog, and closes it
+
 
     :param fpath: string to type in the default focus location of widget
     :type fpath: str
@@ -152,12 +155,10 @@ def reorder_view(view, start_idx, end_idx):
     """
     Simulates a smooth mouse drag from one widget to another
 
-    :param view: Widget where the dragging will take place
-    :type view: PyQt4.QtGui.QAbstractItemView
-    :param start_idx: index of item in view to start drag from
-    :type start_idx: PyQt4.QtCore.QModelIndex
-    :param end_idx: index of item in view to drag to
-    :type end_idx: PyQt4.QtCore.QModelIndex
+    Args:
+        view (PyQt4.QtGui.QAbstractItemView): Widget where the dragging will take place
+        start_idx (PyQt4.QtCore.QModelIndex): index of item in view to start drag from
+        end_idx (PyQt4.QtCore.QModelIndex): index of item in view to drag to
     """
     start_pos = center(view, view.model().index(*start_idx))
     if end_idx[1] > 0:
@@ -177,6 +178,9 @@ def reorder_view(view, start_idx, end_idx):
 def _close_toplevel(cls=QtGui.QDialog):
     """
     Endlessly waits for a QDialog widget, presses enter when found
+    
+    Args:
+        cls : class of the widget to search for
     """
     dialogs = []
     while len(dialogs) == 0:
@@ -189,8 +193,8 @@ def _close_modal(fpath=None, enter=True):
     """
     Endlessly waits for a modal widget, clicks ok button when found. Safe to be run from inside thread.
     
-    :param fpath: string to type in the default focus location of widget
-    :type fpath: str
+    Args:
+        fpath (str) : string to type in the default focus location of widget
     """
     modalWidget = None
     while modalWidget is None:

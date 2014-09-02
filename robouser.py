@@ -9,12 +9,10 @@ def drag(source, dest, speed=1000):
     """
     Simulates a smooth mouse drag
 
-    :param source: location (x,y) to start the drag, in screen coordinates
-    :type source: (int, int)
-    :param dest: location (x,y) to end the drag, in screen coordinates
-    :type dest: (int, int)
-    :param speed: rate at which to execute the drag, in pixels/second
-    :type speed: int
+    Args:
+        source (int, int) : location (x,y) to start the drag, in screen coordinates
+        dest (int, int) : location (x,y) to end the drag, in screen coordinates
+        speed (int) : rate at which to execute the drag, in pixels/second
     """
     m = PyMouse()
     m.press(*source)
@@ -34,8 +32,8 @@ def click(point):
     """
     Simulates a mouse click
 
-    :param point: location (x,y) of the screen to click
-    :type point: (int, int)
+    Args:
+        point (int,int) : location (x,y) of the screen to click
     """
     m = PyMouse()
     m.move(*point)
@@ -46,8 +44,8 @@ def doubleclick(point):
     """
     Simulates a mouse double click
 
-    :param point: location (x,y) of the screen to click
-    :type point: (int, int)
+    Args:
+        point (int, int): location (x,y) of the screen to click
     """
     m = PyMouse()
     m.press(*point)
@@ -59,8 +57,8 @@ def move(point):
     """
     Moves the mouse cursor to the provided location
 
-    :param point: location (x,y) of the screen to place the cursor
-    :type point: (int, int)
+    Args:
+        point (int, int): location (x,y) of the screen to place the cursor
     """
     # wrapper just so we don't have to import pymouse separately
     m = PyMouse()
@@ -70,8 +68,8 @@ def keypress(key):
     """
     Simulates a key press
 
-    :param key: the key [a-zA-Z0-9] to enter. Use 'enter' for the return key
-    :type key: str
+    Args:
+        key (str) : the key [a-zA-Z0-9] to enter. Use 'enter' for the return key
     """
     k = PyKeyboard()
     if key == 'enter':
@@ -81,9 +79,9 @@ def keypress(key):
 def type(string):
     """
     Stimulates typing a string of characters
-    
-    :param string: A string of characters to enter
-    :type string: str
+
+    Args:    
+        string (str) : A string of characters to enter
     """
     k = PyKeyboard()
     k.type_string(string)
@@ -92,8 +90,8 @@ def wheel(ticks):
     """
     Simulates a mouse wheel movement
 
-    :param ticks: number of increments to scroll the whell
-    :type ticks: int
+    Args:
+        ticks (int) : number of increments to scroll the wheel
     """
     m = PyMouse()
     m.scroll(ticks)
