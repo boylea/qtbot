@@ -10,8 +10,10 @@ def drag(source, dest, speed=1000):
     Simulates a smooth mouse drag
 
     Args:
-        source (int, int) : location (x,y) to start the drag, in screen coordinates
-        dest (int, int) : location (x,y) to end the drag, in screen coordinates
+        source (int, int) : location (x,y) to start the drag, in screen 
+            coordinates
+        dest (int, int) : location (x,y) to end the drag, in screen 
+            coordinates
         speed (int) : rate at which to execute the drag, in pixels/second
     """
     m = PyMouse()
@@ -19,6 +21,7 @@ def drag(source, dest, speed=1000):
 
     time.sleep(0.1)
 
+    # number of intermediate movements to make for our given speed
     npoints = int(sqrt((dest[0]-source[0])**2 + (dest[1]-source[1])**2 ) / (speed/1000))
     for i in range(npoints):
         x = int(source[0] + ((dest[0]-source[0])/npoints)*i)
@@ -69,14 +72,15 @@ def keypress(key):
     Simulates a key press
 
     Args:
-        key (str) : the key [a-zA-Z0-9] to enter. Use 'enter' for the return key
+        key (str) : the key [a-zA-Z0-9] to enter. Use 'enter' for the 
+            return key
     """
     k = PyKeyboard()
     if key == 'enter':
         key = k.return_key
     k.tap_key(key)
 
-def type(string):
+def type_msg(string):
     """
     Stimulates typing a string of characters
 
