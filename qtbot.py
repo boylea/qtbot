@@ -151,19 +151,19 @@ def handle_dialog(wait=False):
         while thread.is_alive():
             QtTest.QTest.qWait(500)
 
-def handle_modal_widget(msg=None, wait=True, press_enter=True):
+def handle_modal_widget(wait=True, func=None, args=(), kwargs={}):
     """
     Listens for a modal dialog, and closes it
 
     Args:
-        msg (str) : string to type in the default focus location of widget
         wait (bool) : whether to (non-blocking) wait until dialog is closed to 
             return
-        press_enter (bool): Whether to attempt to close the dialog with a 
-            simulated return key press. If False a signal is sent to the accept 
-            slot of the modal target widget.
+        func : function to run after modal widget is found. Takes the
+            widget as a first argument, then args and kwargs
+        args : ordered arguments to provide to func
+        kwargs : keyword arguments to provide to func
     """
-    thread = threading.Thread(target=_close_modal, args=(msg, press_enter))
+    thread = threading.Thread(target=_close_modal, args=(func, args, kwargs))
     thread.start()
     if wait:
         while thread.is_alive():
@@ -219,27 +219,25 @@ def _close_toplevel(cls=QtGui.QDialog):
     # really only works for one dialog (or other widget) found at a time
     robouser.keypress('enter')
 
-def _close_modal(msg=None, enter=True):
+def _close_modal(func, args, kwargs):
     """
     Endlessly waits for a modal widget, enters text (optional) and closes. Safe 
     to be run from inside thread.
     
     Args:
-        msg (str) : string to type in the default focus location of widget 
-            e.g. filepath in file dialog
-        enter (bool) : Whether to attempt to close the dialog with a simulated 
-            return key press. If False a signal is sent to the accept slot of 
-            the modal target widget.
+        func : function to run after modal widget is found. Takes the
+            widget as a first argument, then args and kwargs
+        args : ordered arguments to provide to func
+        kwargs : keyword arguments to provide to func
     """
     # should probably add timeout
     modalWidget = None
     while modalWidget is None:
         modalWidget = QtGui.QApplication.activeModalWidget()
         time.sleep(1)
-    if msg is not None:
-        type_msg(msg)
-    if enter:
-        robouser.keypress('enter')
+    # perform provided function, else assume dialog and accept
+    if func:
+        func(modalWidget, *args, **kwargs)
     else:
         # cannot call any slots on widget from inside thread
         obj = QObj()
