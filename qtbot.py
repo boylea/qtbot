@@ -162,12 +162,17 @@ def handle_modal_widget(wait=True, func=None, args=(), kwargs={}):
             widget as a first argument, then args and kwargs
         args : ordered arguments to provide to func
         kwargs : keyword arguments to provide to func
+
+    Returns:
+        threading.Thread -- the thread that is waiting to close the widget
     """
     thread = threading.Thread(target=_close_modal, args=(func, args, kwargs))
     thread.start()
     if wait:
         while thread.is_alive():
             QtTest.QTest.qWait(500)
+    else:
+        return thread
 
 def reorder_view(view, start_idx, end_idx):
     """
@@ -181,9 +186,9 @@ def reorder_view(view, start_idx, end_idx):
         end_idx (int, int): index (row, column) of item in view to drag to
 
     Indicies do not need to yet exist, as they may represent the end of a row or 
-    column, but cannot be more than one larger than current column count. Assumes 
-    static row height, variable column width. views must implement method rowReach 
-    returning row span in pixels.
+    column, but cannot be more than one larger than current column count. For a custom 
+    view with static row height, variable column width. views must implement method 
+    rowReach returning row span (height + space) in pixels.
     """
     start_pos = center(view, view.model().index(*start_idx))
     if end_idx[1] > 0:
@@ -204,7 +209,26 @@ def reorder_view(view, start_idx, end_idx):
     while thread.is_alive():
         QtTest.QTest.qWait(500)
 
-def _close_toplevel(cls=QtGui.QDialog):
+def drag_view(view, start_idx, end_idx):
+    """
+    Simulates an internal drag motion, indicies must exist
+
+    Args:
+        view (PyQt4.QtGui.QAbstractItemView): Widget where the dragging will 
+            take place
+        start_idx (int, int): index (row, column) of item in view to start drag
+            from
+        end_idx (int, int): index (row, column) of item in view to drag to
+    """
+    start_pos = center(view, view.model().index(*start_idx))
+    end_pos = center(view, view.model().index(*end_idx))
+    thread = threading.Thread(target=robouser.drag, args=(start_pos, end_pos))
+    thread.start()
+    # block return until drag is finished
+    while thread.is_alive():
+        QtTest.QTest.qWait(500)
+
+def _close_toplevel(cls=QtGui.QDialog, timeout=10):
     """
     Endlessly waits for a QDialog widget, presses enter when found
     
@@ -212,14 +236,15 @@ def _close_toplevel(cls=QtGui.QDialog):
         cls : class of the widget to search for
     """
     dialogs = []
-    while len(dialogs) == 0:
+    start=time.time()
+    while len(dialogs) == 0 and time.time()-start<timeout:
         topWidgets = QtGui.QApplication.topLevelWidgets()
         dialogs = [w for w in topWidgets if isinstance(w, cls)]
         time.sleep(1)
     # really only works for one dialog (or other widget) found at a time
     robouser.keypress('enter')
 
-def _close_modal(func, args, kwargs):
+def _close_modal(func, args, kwargs, timeout=10):
     """
     Endlessly waits for a modal widget, enters text (optional) and closes. Safe 
     to be run from inside thread.
@@ -232,7 +257,8 @@ def _close_modal(func, args, kwargs):
     """
     # should probably add timeout
     modalWidget = None
-    while modalWidget is None:
+    start=time.time()
+    while modalWidget is None and time.time()-start<timeout:
         modalWidget = QtGui.QApplication.activeModalWidget()
         time.sleep(1)
     # perform provided function, else assume dialog and accept
