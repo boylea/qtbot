@@ -8,7 +8,7 @@ import robouser
 class QObj(QtCore.QObject):
     # For use with sending signals when you don't have a handle on
     # a calling widget
-    somethingHappened = QtCore.pyqtSignal()
+    somethingHappened = QtCore.Signal()
 
 def center(widget, view_index=None):
     """
@@ -99,6 +99,9 @@ def keypress(key):
     """
     # convert to sting in case number was passed in
     robouser.keypress(str(key))
+
+def key_combo(key0, key1):
+    robouser.key_combo(str(key0), str(key1))
 
 def type_msg(msg):
     """

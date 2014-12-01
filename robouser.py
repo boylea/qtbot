@@ -99,3 +99,11 @@ def wheel(ticks):
     """
     m = PyMouse()
     m.scroll(ticks)
+
+def key_combo(key0, key1):
+    k = PyKeyboard()
+    if key0 == 'ctrl':
+        key0 = k.control_key
+    k.press_key(key0)
+    k.tap_key(key1)
+    k.release_key(key0)
